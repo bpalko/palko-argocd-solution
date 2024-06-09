@@ -1,0 +1,4 @@
+version: main
+argo-cd:
+  global:
+    domain: argocd.dev-cluster.com

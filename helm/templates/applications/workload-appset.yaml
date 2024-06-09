@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: workload-appset
+spec:
+  goTemplate: true
+  generators:
+    - matrix:
+        generators:
+          - scmProvider:
+              github:
+                organization: bpalko
+                api: https://github.com/bpalko
+                allBranches: true
+                appSecretName: gh-app-repo-creds
+              filters:
+                - repositoryMatch: ^some-test-chart$
+          - matrix:
+            - clusters: {}
+            - git:
+                repoURL: https://github.com/bpalko/some-test-chart
+                revision: HEAD
+                directories:
+                  - path: "helm/config/{{`{{ .metadata.labels.cluster }}`}}.yaml"
+  template:
+    metadata:
+      name: 'application-{{`{{ .repository }}`}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bpalko/{{`{{ .path.basename }}`}}
+        targetRevision: '{{`{{ .revision }}`}}'
+        path: '{{`{{ .path }}`}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{`{{ .path }}`}}-namespace'

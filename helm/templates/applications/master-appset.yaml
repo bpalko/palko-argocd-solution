@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: master-appset
+spec:
+  goTemplate: true
+  generators:
+    - matrix:
+        generators:
+          - scmProvider:
+              github:
+                organization: bpalko
+                api: https://github.com/bpalko/the-argocd-solution
+                allBranches: true
+                appSecretName: gh-app-repo-creds
+              filters:
+                - repositoryMatch: ^the-argocd-solution$
+          - matrix:
+            - clusters: {}
+            - git:
+                repoURL: https://github.com/bpalko/the-argocd-solution
+                revision: HEAD
+                directories:
+                  - path: "helm/config/{{`{{ .metadata.labels.cluster }}`}}.yaml"
+  template:
+    metadata:
+      name: 'application-{{`{{ .repository }}`}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bpalko/{{`{{ .path.basename }}`}}
+        targetRevision: '{{`{{ .revision }}`}}'
+        path: '{{`{{ .path }}`}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{`{{ .path }}`}}-namespace'

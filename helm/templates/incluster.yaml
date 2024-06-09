@@ -1,0 +1,10 @@
+kind: Secret
+data:
+  config: "{'tlsClientConfig':{'insecure':false}}"
+  name: "dev-in-cluster"
+  server: "https://kubernetes.default.svc"
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    cluster: dev-palko
+    environment: dev
