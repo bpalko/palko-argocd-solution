@@ -29,8 +29,8 @@ spec:
       project: default
       source:
         repoURL: https://github.com/bpalko/{{`{{ .path.basename }}`}}
-        targetRevision: '{{`{{ .revision }}`}}'
-        path: '{{`{{ .path }}`}}'
+        targetRevision: '{{`{{ .version }}`}}'
+        path: helm
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{`{{ .path }}`}}-namespace'
